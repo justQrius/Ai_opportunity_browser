@@ -1,282 +1,320 @@
 # AI Opportunity Browser
 
-An AI-native platform that combines autonomous agent-based discovery with community-driven validation to surface market-proven opportunities specifically solvable by AI technologies.
+AI-native platform combining autonomous agent-based discovery with community-driven validation to surface market-proven opportunities specifically solvable by AI technologies.
 
 ## 🚀 Features
 
-- **Autonomous AI Agents**: Specialized agents for monitoring, analysis, research, trend detection, and capability assessment
-- **Multi-Source Data Intelligence**: Reddit, GitHub, social media, job boards, research papers, and news APIs
-- **Community Validation**: Expert verification and crowd-sourced validation workflows
-- **Business Intelligence**: Market sizing, ROI projections, and implementation guidance
-- **Multi-Provider AI Support**: OpenAI, Anthropic, Google, Cohere, and local models
+- **5 Specialized AI Agents**: MonitoringAgent, AnalysisAgent, ResearchAgent, TrendAgent, CapabilityAgent
+- **Real-time Data Sources**: Reddit, GitHub, Hacker News, Y Combinator  
+- **Community Validation**: User scoring and validation system
+- **Business Intelligence**: ROI projections, market analysis, competitive intelligence
+- **Modern Frontend**: Next.js 14 with TypeScript, Tailwind CSS, and Shadcn/ui
+- **Production Ready**: Comprehensive authentication, monitoring, and security
 
 ## 🏗️ Architecture
 
 ```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   Data Sources  │───▶│  Agentic AI Layer │───▶│ Processing Pipeline │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
-                                │
-                                ▼
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│ User Interface  │◀───│  Core Platform   │───▶│ Vector Database │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Frontend      │    │   Backend API   │    │   AI Agents     │
+│   (Next.js 14)  │◄──►│   (FastAPI)     │◄──►│   (5 Agents)    │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                       │                       │
+         │                       │                       │
+         ▼                       ▼                       ▼
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   State Mgmt    │    │   Database      │    │   Data Sources  │
+│ (Zustand+Query) │    │ (PostgreSQL)    │    │ Reddit, GitHub  │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
 ```
-
-## 🛠️ Tech Stack
-
-- **Backend**: FastAPI, Python 3.11+
-- **Frontend**: Next.js 14 with App Router, TypeScript, Tailwind CSS
-- **Databases**: PostgreSQL, Redis, Pinecone (Vector DB)
-- **AI/ML**: LangChain, Multiple LLM providers, Transformers
-- **Task Queue**: Celery
-- **Containerization**: Docker, Docker Compose
-- **Testing**: pytest, pytest-asyncio
 
 ## 📋 Prerequisites
 
-- Python 3.11+
-- Node.js 18+ and npm
-- Docker and Docker Compose
-- Git
+- **Python 3.11+**
+- **Node.js 18+** 
+- **PostgreSQL 13+**
+- **Redis 6+**
+- **Git**
 
-## 🚀 Quick Start
+## 🔧 Quick Setup
 
 ### 1. Clone the Repository
 
 ```bash
-git clone <repository-url>
-cd ai-opportunity-browser
+git clone https://github.com/justQrius/Ai_opportunity_browser.git
+cd Ai_opportunity_browser
 ```
 
-### 2. Set Up Environment
+### 2. Backend Setup
 
 ```bash
-# Copy environment template
-cp .env.example .env
+# Create and activate Python virtual environment
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-# Edit .env with your API keys and configuration
-# At minimum, set:
-# - SECRET_KEY
-# - OPENAI_API_KEY (or other AI provider keys)
-# - PINECONE_API_KEY and PINECONE_ENVIRONMENT
-```
-
-### 3. Install Dependencies
-
-```bash
 # Install Python dependencies
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-# or
-venv\Scripts\activate     # Windows
 pip install -r requirements.txt
 
-# Install frontend dependencies
+# Copy environment template and configure
+cp .env.example .env
+# Edit .env file with your API keys (see API Keys section below)
+```
+
+### 3. Frontend Setup
+
+```bash
+# Navigate to frontend directory
 cd ui
+
+# Install Node.js dependencies
 npm install
-cd ..
+
+# Copy environment template and configure
+cp .env.example .env.local
+# Edit .env.local file with your configuration
 ```
 
-### 4. Start Development Environment
+### 4. Database Setup
 
-**Option 1: Using Makefile (Recommended)**
 ```bash
-# Start databases
-make dev-up
+# Start PostgreSQL and Redis services
+# Ubuntu/Debian:
+sudo systemctl start postgresql redis-server
 
-# In another terminal, start the API server
-make dev-api
+# macOS with Homebrew:
+brew services start postgresql redis
 
-# In a third terminal, start the frontend
-cd ui && npm run dev
+# Create database
+createdb ai_opportunity_browser
+
+# Run database migrations
+alembic upgrade head
 ```
 
-**Option 2: Manual Startup**
-```bash
-# Start databases
-docker-compose up -d postgres redis
+### 5. Start the Application
 
-# Start backend API (in new terminal)
+```bash
+# Start backend (from root directory)
 source venv/bin/activate
-uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
+uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
 
-# Start frontend (in new terminal)
+# Start frontend (in new terminal, from ui/ directory)
 cd ui
 npm run dev
 ```
 
-**Option 3: Use the Convenience Script**
-```bash
-# Start both backend and frontend servers
-./start-servers.sh
-```
-
-## 📚 Access the Application
-
-Once the servers are running, visit:
-- **Frontend Application**: http://localhost:3001
+🎉 **Application URLs:**
+- **Frontend**: http://localhost:3004
 - **Backend API**: http://localhost:8000
-- **Interactive API Docs**: http://localhost:8000/docs
-- **ReDoc Documentation**: http://localhost:8000/redoc
+- **API Documentation**: http://localhost:8000/docs
 
-## 🧪 Testing
+## 🔑 API Keys Configuration
 
-**Backend Tests**
+The application requires several API keys for data sources. Create accounts and obtain keys from:
+
+### Required APIs
+
+#### 1. **GitHub API** (Free)
+- **Purpose**: Access AI repositories, trending developer tools, startup projects
+- **Get Key**: https://github.com/settings/tokens
+- **Permissions**: `public_repo`, `read:user`
+- **Rate Limit**: 5,000 requests/hour
+
+#### 2. **Reddit API** (Free)
+- **Purpose**: Monitor r/artificial, r/MachineLearning, r/startups, r/entrepreneur
+- **Get Key**: https://www.reddit.com/prefs/apps
+- **Type**: Create "script" application
+- **Rate Limit**: 60 requests/minute
+
+#### 3. **OpenAI API** (Optional - for enhanced AI features)
+- **Purpose**: Advanced opportunity analysis and text generation
+- **Get Key**: https://platform.openai.com/api-keys
+- **Usage**: Pay-per-use ($0.0015-0.02 per 1K tokens)
+
+#### 4. **Google Gemini API** (Optional - for enhanced AI features)
+- **Purpose**: Alternative AI model for analysis
+- **Get Key**: https://makersuite.google.com/app/apikey
+- **Usage**: Free tier available
+
+### Configure API Keys
+
+Edit your `.env` file:
+
 ```bash
-# Run all backend tests
-make test
+# Required APIs
+GITHUB_ACCESS_TOKEN=your_github_personal_access_token_here
+REDDIT_CLIENT_ID=your_reddit_client_id_here
+REDDIT_CLIENT_SECRET=your_reddit_client_secret_here
 
-# Run with coverage
-pytest --cov=. --cov-report=html
+# Optional AI APIs (for enhanced features)
+OPENAI_API_KEY=your_openai_api_key_here
+GEMINI_API_KEY=your_google_gemini_api_key_here
+ANTHROPIC_API_KEY=your_anthropic_api_key_here
 
-# Run specific test file
-pytest tests/test_api.py
+# Database Configuration
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/ai_opportunity_browser
+REDIS_URL=redis://localhost:6379/0
+
+# Application Settings
+SECRET_KEY=your-secret-key-change-in-production-make-it-long-and-random
+DEBUG=true
+ENVIRONMENT=development
 ```
 
-**Frontend Tests**
+## 🧪 Development Commands
+
+### Backend Commands
 ```bash
-# Run frontend tests
+# Run API server
+uvicorn api.main:app --reload
+
+# Run tests  
+pytest
+
+# Database migration
+alembic upgrade head
+
+# Start with Docker
+docker-compose up
+```
+
+### Frontend Commands
+```bash
 cd ui
+
+# Development server
+npm run dev
+
+# Production build
+npm run build
+
+# Run tests
 npm test
-
-# Run with coverage
-npm run test:coverage
-
-# Run linting
-npm run lint
 
 # Type checking
 npm run type-check
+
+# Linting
+npm run lint
+
+# Storybook (component library)
+npm run storybook
 ```
-
-## 🔧 Development
-
-### Code Quality
-
-```bash
-# Format code
-make format
-
-# Run linting
-make lint
-
-# Run type checking
-mypy .
-```
-
-### Database Migrations
-
-```bash
-# Create migration
-alembic revision --autogenerate -m "Description"
-
-# Apply migrations
-alembic upgrade head
-
-# Rollback migration
-alembic downgrade -1
-```
-
-### Adding New Data Sources
-
-1. Create a new plugin in `data-ingestion/plugins/`
-2. Inherit from `DataSourcePlugin` base class
-3. Implement required methods: `initialize()`, `fetch_data()`
-4. Register the plugin in the plugin manager
-
-### Adding New AI Agents
-
-1. Create agent class in `agents/` directory
-2. Inherit from base `Agent` class
-3. Implement agent-specific logic
-4. Register with `AgentOrchestrator`
-
-## 🌍 Environment Variables
-
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `DATABASE_URL` | PostgreSQL connection string | Yes |
-| `REDIS_URL` | Redis connection string | Yes |
-| `SECRET_KEY` | JWT secret key | Yes |
-| `PINECONE_API_KEY` | Pinecone vector database key | Yes |
-| `OPENAI_API_KEY` | OpenAI API key | No* |
-| `ANTHROPIC_API_KEY` | Anthropic API key | No* |
-| `GEMINI_API_KEY` | Google Gemini API key | No* |
-| `GITHUB_ACCESS_TOKEN` | GitHub API access token | No |
-| `REDDIT_CLIENT_ID` | Reddit API client ID | No |
-| `REDDIT_CLIENT_SECRET` | Reddit API client secret | No |
-| `PRODUCTHUNT_ACCESS_TOKEN` | ProductHunt API token | No |
-| `DEFAULT_LLM_PROVIDER` | Default AI provider | No |
-
-*At least one AI provider key is required
 
 ## 📁 Project Structure
 
 ```
-ai-opportunity-browser/
-├── api/                    # FastAPI application
-├── agents/                 # AI agents
-├── data-ingestion/         # Data collection and processing
-├── shared/                 # Shared utilities and models
-├── ui/                     # Next.js frontend application
-│   ├── src/
-│   │   ├── app/           # Next.js App Router pages
-│   │   ├── components/    # React components
-│   │   ├── stores/        # Zustand state management
-│   │   └── services/      # API service layer
-│   ├── package.json       # Frontend dependencies
-│   └── tailwind.config.js # Tailwind CSS configuration
-├── scripts/                # Database and deployment scripts
-├── tests/                  # Backend test files
-├── .kiro/                  # Project specifications
-├── docker-compose.yml      # Development environment
-├── Dockerfile.dev          # Development container
-├── requirements.txt        # Python dependencies
-├── start-servers.sh        # Convenience startup script
-└── README.md              # This file
+├── api/                    # FastAPI backend
+│   ├── routers/           # API endpoints
+│   ├── middleware/        # Security, logging, CORS
+│   └── core/             # Configuration, dependencies
+├── agents/                # 5 AI agents for opportunity discovery
+├── shared/               # Shared models, schemas, services
+│   ├── models/           # Database models
+│   ├── schemas/          # Pydantic schemas
+│   └── services/         # Business logic
+├── data-ingestion/       # Plugin architecture for data sources
+├── tests/                # Comprehensive test suite
+├── ui/                   # Next.js 14 frontend
+│   ├── src/app/          # Next.js App Router pages
+│   ├── src/components/   # React components
+│   ├── src/services/     # API service layer
+│   └── src/stores/       # Zustand state management
+├── monitoring/           # Grafana, Prometheus configuration
+└── scripts/              # Utility and demo scripts
 ```
+
+## 🚀 Usage Guide
+
+### 1. **Browse Opportunities**
+- Visit http://localhost:3004/opportunities
+- Use search and filters to find relevant opportunities
+- Sort by validation score, market size, or creation date
+
+### 2. **View Opportunity Details**
+- Click on any opportunity to see detailed analysis
+- Review AI agent analysis and business intelligence
+- Check community validation and discussions
+
+### 3. **User Authentication**
+- Register at http://localhost:3004/auth/register  
+- Login at http://localhost:3004/auth/login
+- Access personalized recommendations and collections
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+#### Backend won't start
+```bash
+# Check Python version
+python3 --version  # Should be 3.11+
+
+# Check if all dependencies installed
+pip install -r requirements.txt
+
+# Check database connection
+psql -d ai_opportunity_browser -c "SELECT 1;"
+```
+
+#### Frontend won't start
+```bash
+# Check Node version
+node --version  # Should be 18+
+
+# Clear node_modules and reinstall
+rm -rf node_modules package-lock.json
+npm install
+
+# Check for port conflicts
+lsof -ti:3004
+```
+
+#### API Keys not working
+- **GitHub**: Ensure token has correct permissions
+- **Reddit**: Verify client ID/secret match your app
+- **Rate Limits**: Check if you've exceeded API limits
+
+### Getting Help
+
+- **Issues**: [GitHub Issues](https://github.com/justQrius/Ai_opportunity_browser/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/justQrius/Ai_opportunity_browser/discussions)
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+1. **Fork the repository**
+2. **Create feature branch**: `git checkout -b feature/amazing-feature`
+3. **Commit changes**: `git commit -m 'Add amazing feature'`
+4. **Push to branch**: `git push origin feature/amazing-feature`
+5. **Open Pull Request**
 
-### Development Guidelines
+### Code Standards
+- **Python**: Follow PEP 8, use type hints
+- **TypeScript**: Strict mode, proper typing
+- **Testing**: Write tests for new features
+- **Documentation**: Update README and docstrings
 
-- Follow PEP 8 style guidelines
-- Write tests for new features
-- Update documentation for API changes
-- Use type hints for all functions
-- Keep functions small and focused
+## 🔒 Security Features
+
+- **JWT Authentication**: Secure user authentication
+- **Rate Limiting**: API rate limiting and throttling
+- **CORS Protection**: Configurable CORS policies
+- **Input Validation**: Comprehensive request validation
+- **SQL Injection Protection**: Parameterized queries
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🆘 Support
+## 🙏 Acknowledgments
 
-- **Documentation**: Check the `/docs` endpoint when running
-- **Issues**: Create an issue on GitHub
-- **Discussions**: Use GitHub Discussions for questions
-
-## 🗺️ Roadmap
-
-- [x] Core infrastructure and data models
-- [x] Multi-provider AI integration  
-- [x] Data ingestion plugins (Reddit, GitHub)
-- [x] AI agent orchestration system
-- [x] Community validation system
-- [x] Business intelligence features
-- [x] Web interface (Next.js frontend)
-- [ ] Advanced analytics dashboard
-- [ ] Mobile application
-- [ ] Marketplace features
-- [ ] Real-time collaboration tools
+- **FastAPI**: Modern, fast web framework for Python
+- **Next.js**: The React framework for production
+- **Shadcn/ui**: Beautiful component library
+- **PostgreSQL**: Powerful, open source object-relational database
+- **Redis**: In-memory data structure store
 
 ---
 
-Built with ❤️ using FastAPI and modern AI technologies.
+**Built with ❤️ by [justQrius](https://github.com/justQrius)**
+
+⭐ **Star this repo if you find it useful!**
