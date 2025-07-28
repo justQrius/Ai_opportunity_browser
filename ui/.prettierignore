@@ -1,0 +1,10 @@
+node_modules
+.next
+out
+build
+coverage
+.storybook
+public
+*.log
+package-lock.json
+.env*
