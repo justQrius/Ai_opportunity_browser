@@ -67,7 +67,7 @@ const mockProfile: UserProfile = {
 };
 
 export default function ProfilePage() {
-  const { user, isAuthenticated } = useAuthStore();
+  const { isAuthenticated } = useAuthStore();
   const router = useRouter();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -137,7 +137,7 @@ export default function ProfilePage() {
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
+                  onClick={() => setActiveTab(tab.id as 'overview' | 'activity' | 'collections' | 'settings')}
                   className={`flex items-center gap-2 px-6 py-4 text-sm font-medium transition-colors hover:text-primary ${
                     activeTab === tab.id
                       ? 'border-b-2 border-primary text-primary'

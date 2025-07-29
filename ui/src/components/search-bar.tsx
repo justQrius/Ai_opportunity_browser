@@ -189,7 +189,7 @@ export function SearchBar({
     if (value !== inputValue) {
       setInputValue(value);
     }
-  }, [value]);
+  }, [value, inputValue]);
 
   const sizeClasses = {
     default: 'h-10',

@@ -33,97 +33,28 @@ import {
 import { useTrending } from '@/hooks/useOpportunities';
 import { cn } from '@/lib/utils';
 
-interface TrendingPageProps {}
+export default function TrendingPage() {
+  const marketIndicators = [
+    { label: 'Total Opportunities', value: '1,280', trend: 'up', change: '+5.2%', period: '7d' },
+    { label: 'Market Size', value: '$4.5B', trend: 'up', change: '+12%', period: '30d' },
+    { label: 'Community Validations', value: '25.6k', trend: 'up', change: '+8.1%', period: '7d' },
+    { label: 'New Opportunities (24h)', value: '42', trend: 'down', change: '-3.5%', period: '24h' },
+  ];
 
-// Mock trending data to supplement API data
-const trendingTechnologies = [
-  { 
-    name: 'Generative AI', 
-    growth: '+127%', 
-    opportunities: 45,
-    trend: 'up',
-    description: 'AI systems that generate content, code, and creative works'
-  },
-  { 
-    name: 'Computer Vision', 
-    growth: '+89%', 
-    opportunities: 34,
-    trend: 'up',
-    description: 'AI that interprets and understands visual information'
-  },
-  { 
-    name: 'Natural Language Processing', 
-    growth: '+76%', 
-    opportunities: 28,
-    trend: 'up',
-    description: 'AI for understanding and generating human language'
-  },
-  { 
-    name: 'Edge AI', 
-    growth: '+64%', 
-    opportunities: 23,
-    trend: 'up',
-    description: 'AI processing directly on devices and edge computing'
-  },
-  { 
-    name: 'Autonomous Systems', 
-    growth: '+52%', 
-    opportunities: 19,
-    trend: 'up',
-    description: 'Self-operating AI systems for robotics and automation'
-  },
-  { 
-    name: 'AI Ethics & Safety', 
-    growth: '+41%', 
-    opportunities: 15,
-    trend: 'up',
-    description: 'Responsible AI development and governance frameworks'
-  },
-];
+  const trendingTechnologies = [
+    { name: 'Large Language Models (LLMs)', opportunities: 152, growth: '+25%', trend: 'up', description: 'Advanced models for text generation and understanding.' },
+    { name: 'Generative Adversarial Networks (GANs)', opportunities: 89, growth: '+18%', trend: 'up', description: 'For creating realistic images, video, and audio.' },
+    { name: 'Reinforcement Learning', opportunities: 76, growth: '+12%', trend: 'up', description: 'Training models through trial and error.' },
+    { name: 'Computer Vision', opportunities: 112, growth: '+9%', trend: 'down', description: 'Analyzing and understanding visual data.' },
+  ];
 
-const marketIndicators = [
-  {
-    label: 'Global AI Market Size',
-    value: '$515.31B',
-    change: '+21.4%',
-    trend: 'up',
-    period: '2024'
-  },
-  {
-    label: 'AI Startup Funding',
-    value: '$65.2B',
-    change: '+14.8%',
-    trend: 'up',
-    period: 'YTD 2024'
-  },
-  {
-    label: 'AI Job Postings',
-    value: '2.3M',
-    change: '+31.2%',
-    trend: 'up',
-    period: 'Q4 2024'
-  },
-  {
-    label: 'Patents Filed',
-    value: '89,400',
-    change: '+18.7%',
-    trend: 'up',
-    period: '2024'
-  }
-];
-
-const hotIndustries = [
-  { name: 'Healthcare', score: 95, opportunities: 67, growth: '+89%' },
-  { name: 'Financial Services', score: 92, opportunities: 54, growth: '+76%' },
-  { name: 'Retail & E-commerce', score: 88, opportunities: 41, growth: '+67%' },
-  { name: 'Manufacturing', score: 85, opportunities: 38, growth: '+54%' },
-  { name: 'Education', score: 82, opportunities: 29, growth: '+45%' },
-  { name: 'Transportation', score: 79, opportunities: 24, growth: '+38%' }
-];
-
-export default function TrendingPage({}: TrendingPageProps) {
+  const hotIndustries = [
+    { name: 'Healthcare', score: 92, growth: '+15%', opportunities: 215 },
+    { name: 'Finance', score: 88, growth: '+11%', opportunities: 180 },
+    { name: 'E-commerce', score: 85, growth: '+20%', opportunities: 150 },
+    { name: 'Education', score: 82, growth: '+18%', opportunities: 132 },
+  ];
   const [timeRange, setTimeRange] = useState<'24h' | '7d' | '30d' | '90d'>('7d');
-  const [sortBy, setSortBy] = useState<'growth' | 'opportunities' | 'score'>('growth');
   
   // Fetch trending opportunities from API
   const { 

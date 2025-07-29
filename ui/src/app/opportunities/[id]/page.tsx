@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { notFound } from 'next/navigation';
 import { 
@@ -19,10 +19,13 @@ import {
   LoadingSpinner,
   OpportunityCard
 } from '@/components';
-import { ValidationForm } from '@/components/validation-form';
-import { 
+import { ValidationForm, ValidationData } from '@/components/validation-form';
+import { DeepDiveManager } from '@/components/deep-dive-manager';
+import { toast } from "sonner"
+import {
   ArrowLeft,
   BookmarkPlus,
+  BrainCircuit,
   Share2,
   TrendingUp,
   DollarSign,
@@ -38,7 +41,8 @@ import {
   Flag,
   ExternalLink,
   Download,
-  Eye
+  Eye,
+  Loader2
 } from 'lucide-react';
 import { useOpportunity } from '@/hooks/useOpportunities';
 import { cn } from '@/lib/utils';
@@ -133,13 +137,15 @@ export default function OpportunityDetailPage() {
   
   const [activeTab, setActiveTab] = useState<'overview' | 'validation' | 'discussion' | 'business'>('overview');
   const [bookmarked, setBookmarked] = useState(false);
+  const [deepDiveWorkflowId, setDeepDiveWorkflowId] = useState<string | null>(null);
+  const [isPolling, setIsPolling] = useState(false);
   
   // Use real API data
   const { data: opportunity, isLoading, error } = useOpportunity(opportunityId);
   
   // Extract real agent analysis data if available
   const agentAnalysis = opportunity?.agent_analysis || null;
-  const businessIntel = agentAnalysis?.viability || mockBusinessIntelligence;
+  const businessIntel = agentAnalysis || mockBusinessIntelligence;
   const aiCapabilities = agentAnalysis?.ai_capabilities || null;
 
   if (isLoading) {
@@ -199,9 +205,10 @@ export default function OpportunityDetailPage() {
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
     // TODO: Add toast notification
+    toast.success("Link copied to clipboard!");
   };
 
-  const handleValidateSubmit = async (validationData: any) => {
+  const handleValidateSubmit = async (validationData: ValidationData) => {
     // TODO: Implement actual API call
     console.log('Submitting validation:', validationData);
     // Simulate API delay
@@ -357,6 +364,7 @@ export default function OpportunityDetailPage() {
                     <ExternalLink className="w-4 h-4" />
                     View Sources
                   </Button>
+                  <DeepDiveManager opportunity={opportunity} />
                 </div>
               </CardContent>
             </Card>
@@ -374,7 +382,7 @@ export default function OpportunityDetailPage() {
                   return (
                     <button
                       key={tab.id}
-                      onClick={() => setActiveTab(tab.id as any)}
+                      onClick={() => setActiveTab(tab.id as 'overview' | 'validation' | 'discussion' | 'business')}
                       className={cn(
                         'flex items-center gap-2 py-2 px-1 border-b-2 font-medium text-sm transition-colors',
                         activeTab === tab.id
@@ -405,25 +413,25 @@ export default function OpportunityDetailPage() {
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div className="text-center">
                           <div className="text-lg font-semibold">
-                            {(businessIntel as any)?.market_size_assessment || 'Large Market'}
+                            {(businessIntel as any)?.viability?.market_size_assessment || 'Large Market'}
                           </div>
                           <div className="text-sm text-muted-foreground">Market Assessment</div>
                         </div>
                         <div className="text-center">
                           <div className="text-lg font-semibold">
-                            {(businessIntel as any)?.competition_level || 'Medium'}
+                            {(businessIntel as any)?.viability?.competition_level || 'Medium'}
                           </div>
                           <div className="text-sm text-muted-foreground">Competition Level</div>
                         </div>
                         <div className="text-center">
                           <div className="text-lg font-semibold">
-                            {(businessIntel as any)?.technical_feasibility || 'High'}
+                            {(businessIntel as any)?.viability?.technical_feasibility || 'High'}
                           </div>
                           <div className="text-sm text-muted-foreground">Technical Feasibility</div>
                         </div>
                         <div className="text-center">
                           <div className="text-lg font-semibold">
-                            {(businessIntel as any)?.roi_projection?.time_to_market || '6-12 months'}
+                            {(businessIntel as any)?.viability?.roi_projection?.time_to_market || '6-12 months'}
                           </div>
                           <div className="text-sm text-muted-foreground">Time to Market</div>
                         </div>
@@ -549,7 +557,7 @@ export default function OpportunityDetailPage() {
                           <div>
                             <div className="text-sm font-medium mb-2">Technology Trends:</div>
                             <div className="space-y-1">
-                              {agentAnalysis.market_trends.hot_technologies.slice(0, 3).map((tech: any, index: number) => (
+                              {agentAnalysis.market_trends.hot_technologies.slice(0, 3).map((tech: { name: string; growth_rate: string; }, index: number) => (
                                 <div key={index} className="flex justify-between text-sm">
                                   <span>{tech.name}</span>
                                   <Badge variant="secondary" className="text-xs">+{tech.growth_rate}</Badge>
@@ -777,19 +785,19 @@ export default function OpportunityDetailPage() {
                         <div>
                           <div className="text-sm text-muted-foreground">Break Even</div>
                           <div className="text-lg font-semibold">
-                            {(businessIntel as any)?.roi_projection?.break_even || mockBusinessIntelligence.roiProjection.time_to_break_even} months
+                            {(businessIntel as any)?.viability?.roi_projection?.break_even || mockBusinessIntelligence.roiProjection.time_to_break_even} months
                           </div>
                         </div>
                         <div>
                           <div className="text-sm text-muted-foreground">Time to Market</div>
                           <div className="text-lg font-semibold">
-                            {(businessIntel as any)?.roi_projection?.time_to_market || '6-12 months'}
+                            {(businessIntel as any)?.viability?.roi_projection?.time_to_market || '6-12 months'}
                           </div>
                         </div>
                         <div>
                           <div className="text-sm text-muted-foreground">Year 1 Revenue</div>
                           <div className="text-lg font-semibold text-green-600">
-                            ${(((businessIntel as any)?.roi_projection?.projected_revenue_y1 || mockBusinessIntelligence.roiProjection.projected_revenue_y1) / 1000000).toFixed(1)}M
+                            ${(((businessIntel as any)?.viability?.roi_projection?.projected_revenue_y1 || mockBusinessIntelligence.roiProjection.projected_revenue_y1) / 1000000).toFixed(1)}M
                           </div>
                         </div>
                         <div>

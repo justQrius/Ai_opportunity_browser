@@ -2,8 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   opportunitiesService, 
   Opportunity, 
-  SearchParams,
-  PaginatedResponse 
+  SearchParams 
 } from '@/services/opportunities';
 
 // Query keys

@@ -12,10 +12,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { 
-  TrendingUp, 
-  Users, 
-  Star, 
+import { toast } from "sonner"
+import {
+  TrendingUp,
+  Users,
+  Star,
   Filter,
   BarChart3,
   Sparkles
@@ -25,26 +26,21 @@ import { useOpportunityStore } from '@/stores/opportunityStore';
 import { cn } from '@/lib/utils';
 import type { OpportunityFilters, SortField, SortOrder } from '@/types';
 
-interface OpportunitiesPageProps {}
+export default function OpportunitiesPage() {
+  const quickFilters = [
+    { label: 'High Impact', filters: { min_impact_score: 4 } },
+    { label: 'Low Complexity', filters: { implementation_complexity: 'LOW' } },
+    { label: 'Recently Added', filters: { created_at: 'desc' } },
+    { label: 'Top Validated', filters: { validation_score: 'desc' } },
+  ];
 
-// Mock trending data for now - will be replaced with real data
-const trendingTopicsFallback = [
-  { name: 'AI Chatbots', count: 156, trend: '+23%' },
-  { name: 'Computer Vision', count: 134, trend: '+18%' },
-  { name: 'Predictive Analytics', count: 98, trend: '+31%' },
-  { name: 'Natural Language Processing', count: 87, trend: '+12%' },
-  { name: 'Automation', count: 76, trend: '+45%' }
-];
-
-const quickFilters = [
-  { label: 'High Validation Score', filters: { min_validation_score: 80 } },
-  { label: 'Large Market Size', filters: { market_size_min: 1000000000 } },
-  { label: 'Low Complexity', filters: { implementation_complexity: 'LOW' } },
-  { label: 'Healthcare', filters: { industry: 'Healthcare' } },
-  { label: 'Recent', filters: {} } // Will be handled separately
-];
-
-export default function OpportunitiesPage({}: OpportunitiesPageProps) {
+  const trendingTopicsFallback = [
+    { name: 'AI-Powered Chatbots', count: 120, trend: '+15%' },
+    { name: 'Predictive Analytics', count: 95, trend: '+8%' },
+    { name: 'Content Generation', count: 80, trend: '+22%' },
+    { name: 'Process Automation', count: 75, trend: '-5%' },
+    { name: 'Personalized Recommendations', count: 60, trend: '+12%' },
+  ];
   const searchParams = useSearchParams();
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -52,8 +48,7 @@ export default function OpportunitiesPage({}: OpportunitiesPageProps) {
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
   
   // Store state
-  const { 
-    opportunities, 
+  const {
     filters, 
     loading, 
     error, 
@@ -87,7 +82,7 @@ export default function OpportunitiesPage({}: OpportunitiesPageProps) {
     
     const urlFilters: OpportunityFilters = {};
     if (industry) urlFilters.industry = industry;
-    if (complexity) urlFilters.implementation_complexity = complexity as any;
+    if (complexity) urlFilters.implementation_complexity = complexity as 'LOW' | 'MEDIUM' | 'HIGH';
     
     if (Object.keys(urlFilters).length > 0) {
       setFilters(urlFilters);
@@ -126,7 +121,7 @@ export default function OpportunitiesPage({}: OpportunitiesPageProps) {
     setSearchQuery('');
   };
 
-  const activeFilterCount = Object.keys(filters).length + (searchQuery ? 1 : 0);
+    const activeFilterCount = Object.keys(filters).length + (searchQuery ? 1 : 0);
   const isDataLoading = loading || isLoading;
   const displayError = error || apiError?.message;
   const displayOpportunities = opportunityData?.items || [];

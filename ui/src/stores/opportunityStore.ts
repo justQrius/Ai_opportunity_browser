@@ -99,7 +99,7 @@ export const useOpportunityStore = create<OpportunityState>((set, get) => ({
         },
         loading: false,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       set({
         loading: false,
         error: error.response?.data?.message || 'Failed to search opportunities',
@@ -132,7 +132,7 @@ export const useOpportunityStore = create<OpportunityState>((set, get) => ({
         },
         loading: false,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       set({
         loading: false,
         error: error.response?.data?.message || 'Failed to load opportunities',
@@ -148,7 +148,7 @@ export const useOpportunityStore = create<OpportunityState>((set, get) => ({
         currentOpportunity: opportunity,
         loading: false,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       set({
         loading: false,
         error: error.response?.data?.message || 'Failed to load opportunity',

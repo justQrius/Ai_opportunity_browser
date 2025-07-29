@@ -224,9 +224,13 @@ class BaseAgent(ABC):
             health_status.update(agent_health)
             
             # Determine overall health
-            if (self.state == AgentState.ERROR or 
-                self.metrics.success_rate() < 50 or 
-                self.metrics.error_count > 10):
+            # Determine overall health
+            is_unhealthy = (
+                self.state == AgentState.ERROR or
+                (self.metrics.tasks_completed > 0 and self.metrics.success_rate() < 50) or
+                self.metrics.error_count > 10
+            )
+            if is_unhealthy:
                 health_status["healthy"] = False
             
             return health_status

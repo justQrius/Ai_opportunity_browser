@@ -17,7 +17,7 @@ export function Providers({ children }: ProvidersProps) {
           queries: {
             staleTime: 5 * 60 * 1000, // 5 minutes
             gcTime: 10 * 60 * 1000, // 10 minutes
-            retry: (failureCount, error: any) => {
+            retry: (failureCount, error: Error & { response?: { status: number } }) => {
               // Don't retry on 4xx errors except 408, 429
               if (error?.response?.status >= 400 && error?.response?.status < 500) {
                 if (error?.response?.status === 408 || error?.response?.status === 429) {
@@ -31,7 +31,7 @@ export function Providers({ children }: ProvidersProps) {
             retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
           },
           mutations: {
-            retry: (failureCount, error: any) => {
+            retry: (failureCount, error: Error & { response?: { status: number } }) => {
               // Don't retry mutations on client errors
               if (error?.response?.status >= 400 && error?.response?.status < 500) {
                 return false;

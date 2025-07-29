@@ -25,6 +25,19 @@ import structlog
 
 logger = structlog.get_logger(__name__)
 
+from agents.orchestrator import AgentOrchestrator
+
+def get_orchestrator(request: Request) -> AgentOrchestrator:
+    """
+    Get the singleton instance of the AgentOrchestrator from the app state.
+    """
+    if not hasattr(request.app.state, 'orchestrator'):
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Agent orchestrator is not available."
+        )
+    return request.app.state.orchestrator
+
 # HTTP Bearer token scheme - auto_error=False allows optional authentication
 security = HTTPBearer(auto_error=False)
 

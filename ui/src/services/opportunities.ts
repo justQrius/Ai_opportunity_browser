@@ -31,8 +31,28 @@ export interface PaginatedResponse<T> {
   pages: number;
 }
 
+interface ApiOpportunity {
+  id: string;
+  title: string;
+  description: string;
+  market_size?: number;
+  validation_score: number;
+  ai_feasibility_score?: number;
+  target_industries?: string[];
+  industry?: string;
+  ai_solution_types?: string[];
+  ai_solution_type?: string;
+  implementation_complexity?: string;
+  validation_count?: number;
+  created_at: string;
+  updated_at: string;
+  generated_by?: string;
+  generation_method?: string;
+  agent_analysis?: Opportunity['agent_analysis'];
+}
+
 // Helper function to transform API opportunity to frontend format
-const transformOpportunity = (apiOpp: any): Opportunity => ({
+const transformOpportunity = (apiOpp: ApiOpportunity): Opportunity => ({
   id: apiOpp.id,
   title: apiOpp.title,
   description: apiOpp.description,

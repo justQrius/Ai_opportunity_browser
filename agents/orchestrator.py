@@ -13,59 +13,37 @@ This module implements:
 import asyncio
 import logging
 from datetime import datetime, timedelta
+import asyncio
+import logging
+from datetime import datetime, timedelta
 from enum import Enum
 from typing import Any, Dict, List, Optional, Set, Type, Union
 from dataclasses import dataclass, asdict
 import uuid
 
 from .base import BaseAgent, AgentTask, AgentState, AgentPriority, AgentMetrics
+from .models import Workflow, WorkflowStep, WorkflowState
+from .planner_agent import PlannerAgent
 
 logger = logging.getLogger(__name__)
 
 
-class WorkflowState(Enum):
-    """Workflow execution states"""
-    PENDING = "pending"
-    RUNNING = "running"
-    COMPLETED = "completed"
-    FAILED = "failed"
-    CANCELLED = "cancelled"
-
-
 @dataclass
-class WorkflowStep:
-    """Represents a step in an agent workflow"""
-    step_id: str
-    agent_type: str
-    task_type: str
-    input_data: Dict[str, Any]
-    dependencies: List[str] = None
-    timeout: int = 300  # 5 minutes default
-    retry_count: int = 0
-    max_retries: int = 3
+class HealthStatus:
+    """Overall system health status"""
+    healthy: bool
+    total_agents: int
+    active_agents: int
+    failed_agents: int
+    total_workflows: int
+    active_workflows: int
+    system_load: float
+    last_check: datetime
+    issues: List[str] = None
     
     def __post_init__(self):
-        if self.dependencies is None:
-            self.dependencies = []
-
-
-@dataclass
-class Workflow:
-    """Represents a complete agent workflow"""
-    workflow_id: str
-    name: str
-    steps: List[WorkflowStep]
-    state: WorkflowState = WorkflowState.PENDING
-    created_at: datetime = None
-    started_at: datetime = None
-    completed_at: datetime = None
-    results: Dict[str, Any] = None
-    
-    def __post_init__(self):
-        if self.created_at is None:
-            self.created_at = datetime.utcnow()
-        if self.results is None:
-            self.results = {}
+        if self.issues is None:
+            self.issues = []
 
 
 @dataclass
@@ -307,6 +285,47 @@ class AgentOrchestrator:
         await self.submit_workflow(workflow)
         return workflow_id
     
+    async def trigger_dynamic_workflow(self, problem_description: str) -> str:
+        """
+        Triggers a dynamic workflow by first invoking the PlannerAgent.
+        """
+        logger.info(f"Triggering dynamic workflow for: {problem_description}")
+
+        # 1. Find a Planner Agent
+        planner_agents = [
+            agent for agent in self.agents.values()
+            if isinstance(agent, PlannerAgent) and agent.state == AgentState.RUNNING
+        ]
+        
+        if not planner_agents:
+            # Deploy a planner agent if none are available
+            try:
+                planner_id = await self.deploy_agent("PlannerAgent", config={})
+                planner_agent = self.agents[planner_id]
+            except Exception as e:
+                logger.error(f"Could not deploy a PlannerAgent: {e}")
+                raise
+        else:
+            planner_agent = min(planner_agents, key=lambda a: len(a.active_tasks))
+
+        # 2. Create and execute a planning task
+        planning_task = AgentTask(
+            id=f"plan_{uuid.uuid4().hex[:8]}",
+            type="generate_workflow",
+            data={"problem_description": problem_description}
+        )
+        
+        # The PlannerAgent's process_task is synchronous in this design
+        workflow = await planner_agent.process_task(planning_task)
+        
+        if not workflow or not isinstance(workflow, Workflow):
+            raise Exception("PlannerAgent did not return a valid workflow.")
+
+        # 3. Submit the generated workflow for execution
+        await self.submit_workflow(workflow)
+        logger.info(f"Dynamic workflow {workflow.workflow_id} submitted for execution.")
+        return workflow.workflow_id
+
     async def submit_workflow(self, workflow: Workflow) -> None:
         """Submit a workflow for execution"""
         self.workflows[workflow.workflow_id] = workflow
@@ -467,6 +486,9 @@ class AgentOrchestrator:
             logger.info(f"Executing workflow {workflow_id}")
             
             # Execute steps based on dependencies
+            # In a full implementation of Dynamic Workflow Generation, this is where
+            # the loop would pause and consult the PlannerAgent to potentially
+            # modify the remaining steps based on the results of the last step.
             completed_steps = set()
             
             while len(completed_steps) < len(workflow.steps):

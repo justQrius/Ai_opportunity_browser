@@ -209,7 +209,7 @@ export function ProfileSettings({ profile, onSave, className }: ProfileSettingsP
               return (
                 <button
                   key={section.id}
-                  onClick={() => setActiveSection(section.id as any)}
+                  onClick={() => setActiveSection(section.id as 'profile' | 'privacy' | 'notifications')}
                   className={`flex items-center gap-2 px-6 py-4 text-sm font-medium transition-colors hover:text-primary ${
                     activeSection === section.id
                       ? 'border-b-2 border-primary text-primary'

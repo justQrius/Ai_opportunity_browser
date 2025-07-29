@@ -52,7 +52,7 @@ export const useAuthStore = create<AuthState>()(
             isLoading: false,
             error: null,
           });
-        } catch (error: any) {
+        } catch (error: unknown) {
           set({
             isLoading: false,
             error: error.response?.data?.message || 'Login failed',
@@ -77,7 +77,7 @@ export const useAuthStore = create<AuthState>()(
             isLoading: false,
             error: null,
           });
-        } catch (error: any) {
+        } catch (error: unknown) {
           set({
             isLoading: false,
             error: error.response?.data?.message || 'Registration failed',
@@ -90,9 +90,9 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true });
         try {
           await authService.logout();
-        } catch (error) {
+        } catch {
           // Continue with logout even if API call fails
-          console.error('Logout API call failed:', error);
+          console.error('Logout API call failed:');
         } finally {
           // Clear all auth state
           set({
@@ -104,8 +104,7 @@ export const useAuthStore = create<AuthState>()(
           });
         }
       },
-
-      clearError: () => {
+          clearError: () => {
         set({ error: null });
       },
 
@@ -124,7 +123,7 @@ export const useAuthStore = create<AuthState>()(
             isAuthenticated: true,
             isLoading: false,
           });
-        } catch (error) {
+                } catch (error: unknown) {
           // Token is invalid, clear it
           localStorage.removeItem('access_token');
           localStorage.removeItem('refresh_token');

@@ -34,6 +34,7 @@ interface ValidationFormProps {
   className?: string;
 }
 
+export type { ValidationData };
 interface ValidationData {
   score: number;
   comment: string;
@@ -81,11 +82,9 @@ const scoreLabels = {
 };
 
 export function ValidationForm({ 
-  opportunityId, 
   opportunityTitle, 
   trigger, 
-  onSubmit,
-  className 
+  onSubmit
 }: ValidationFormProps) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -179,7 +178,7 @@ export function ValidationForm({
         <DialogHeader>
           <DialogTitle>Validate Opportunity</DialogTitle>
           <DialogDescription>
-            Share your expert assessment of "{opportunityTitle}"
+            Share your expert assessment of &quot;{opportunityTitle}&quot;
           </DialogDescription>
         </DialogHeader>
 

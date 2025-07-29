@@ -54,7 +54,7 @@ export function ProtectedRoute({
 
   // Check role requirements if user is authenticated
   if (isAuthenticated && requiredRoles.length > 0 && user) {
-    const hasRequiredRole = requiredRoles.some(role => {
+    const hasRequiredRole = requiredRoles.some(() => {
       // Add role checking logic here based on your user model
       // For now, we'll assume all authenticated users have access
       return true;
@@ -66,7 +66,7 @@ export function ProtectedRoute({
           <div className="text-center space-y-4">
             <h1 className="text-2xl font-bold">Access Denied</h1>
             <p className="text-muted-foreground">
-              You don't have permission to access this page.
+              You don&apos;t have permission to access this page.
             </p>
           </div>
         </div>

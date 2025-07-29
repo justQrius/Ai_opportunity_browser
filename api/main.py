@@ -15,7 +15,7 @@ import logging
 from typing import Dict, Any
 
 from api.core.config import get_settings
-from api.routers import health, auth, opportunities, users, validations, reputation, moderation, recommendations, discussions, business_intelligence, timeline_estimation, user_matching, messaging, events, configuration, feature_flags, metrics, security, audit
+from api.routers import health, auth, opportunities, users, validations, reputation, moderation, recommendations, discussions, business_intelligence, timeline_estimation, user_matching, messaging, events, configuration, feature_flags, metrics, security, audit, agents
 from api.middleware.security import SecurityHeadersMiddleware, ThreatDetectionMiddleware, ZeroTrustMiddleware
 from api.middleware.rate_limit import RateLimitMiddleware
 from api.middleware.event_middleware import EventBusMiddleware, EventContextMiddleware
@@ -25,6 +25,10 @@ from shared.logging_config import get_logger
 from shared.security.zero_trust import setup_zero_trust
 from shared.security.service_config import setup_service_registry
 from shared.security.monitoring import setup_security_monitoring
+from agents.orchestrator import AgentOrchestrator
+from agents.planner_agent import PlannerAgent
+from agents.research_agent import ResearchAgent
+from agents.analysis_agent import AnalysisAgent
 
 # Setup observability (logging, tracing, monitoring)
 observability_config = ObservabilityConfig(
@@ -103,6 +107,31 @@ async def lifespan(app: FastAPI):
         logger.error(f"❌ Failed to initialize zero trust security: {e}")
         # Don't fail startup - let health checks handle it
     
+    # Initialize and start the agent orchestrator
+    try:
+        orchestrator = AgentOrchestrator()
+        orchestrator.register_agent_type("PlannerAgent", PlannerAgent)
+        orchestrator.register_agent_type("ResearchAgent", ResearchAgent)
+        orchestrator.register_agent_type("AnalysisAgent", AnalysisAgent)
+        await orchestrator.start()
+        app.state.orchestrator = orchestrator
+        logger.info("✅ Agent orchestrator started and agents registered")
+
+        # Deploy initial worker agents
+        initial_agents = {
+            "PlannerAgent": 1,
+            "ResearchAgent": 2,
+            "AnalysisAgent": 2,
+        }
+        for agent_type, count in initial_agents.items():
+            for i in range(count):
+                try:
+                    await orchestrator.deploy_agent(agent_type, agent_id=f"{agent_type}_{i+1}")
+                except Exception as e:
+                    logger.error(f"Failed to deploy initial agent {agent_type}_{i+1}: {e}")
+    except Exception as e:
+        logger.error(f"❌ Failed to start agent orchestrator: {e}")
+
     yield
     
     # Shutdown
@@ -115,6 +144,14 @@ async def lifespan(app: FastAPI):
             logger.info("✅ Event bus system shutdown")
     except Exception as e:
         logger.error(f"❌ Error shutting down event bus system: {e}")
+
+    # Shutdown agent orchestrator
+    try:
+        if hasattr(app.state, 'orchestrator'):
+            await app.state.orchestrator.stop()
+            logger.info("✅ Agent orchestrator stopped")
+    except Exception as e:
+        logger.error(f"❌ Error stopping agent orchestrator: {e}")
     
     # Cleanup database connections
     try:
@@ -222,6 +259,7 @@ def create_application() -> FastAPI:
     app.include_router(feature_flags.router, prefix="/api/v1/feature-flags", tags=["feature flags"])
     app.include_router(security.router, prefix="/api/v1", tags=["security"])
     app.include_router(audit.router, prefix="/api/v1/audit", tags=["audit"])
+    app.include_router(agents.router, prefix="/api/v1", tags=["agents"])
     
     # Global exception handler
     @app.exception_handler(Exception)

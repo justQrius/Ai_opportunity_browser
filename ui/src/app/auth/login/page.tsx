@@ -25,7 +25,6 @@ import {
   Sparkles
 } from 'lucide-react';
 import { useAuthStore } from '@/stores/authStore';
-import { cn } from '@/lib/utils';
 
 const loginSchema = z.object({
   email: z
@@ -270,7 +269,7 @@ export default function LoginPage() {
 
             {/* Sign up link */}
             <div className="text-center text-sm">
-              <span className="text-muted-foreground">Don't have an account? </span>
+              <span className="text-muted-foreground">Don&apos;t have an account? </span>
               <Link 
                 href={`/auth/register${redirectTo !== '/opportunities' ? `?redirect=${encodeURIComponent(redirectTo)}` : ''}`}
                 className="text-primary hover:underline font-medium"

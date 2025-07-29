@@ -109,7 +109,7 @@ function FilterContent({
     }));
   };
 
-  const updateFilter = (key: keyof OpportunityFilters, value: any) => {
+  const updateFilter = (key: keyof OpportunityFilters, value: string | number | undefined) => {
     onFiltersChange({
       ...filters,
       [key]: value || undefined

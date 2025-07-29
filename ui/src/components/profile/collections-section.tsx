@@ -12,12 +12,7 @@ import {
   Search,
   Grid3X3,
   List,
-  Star,
-  TrendingUp,
-  Clock,
-  Filter,
   ArrowUpDown,
-  MoreHorizontal,
   Folder,
   FolderOpen
 } from 'lucide-react';
@@ -135,7 +130,6 @@ export function CollectionsSection({ userId, stats, className }: CollectionsSect
   const [bookmarkedOpportunities, setBookmarkedOpportunities] = useState<BookmarkedOpportunity[]>([]);
   const [selectedCollection, setSelectedCollection] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [sortBy, setSortBy] = useState<'recent' | 'title' | 'score'>('recent');
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [isCollectionModalOpen, setIsCollectionModalOpen] = useState(false);

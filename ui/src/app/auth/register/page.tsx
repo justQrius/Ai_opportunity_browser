@@ -24,7 +24,6 @@ import {
   ArrowRight,
   AlertCircle,
   CheckCircle,
-  Sparkles,
   X,
   Plus
 } from 'lucide-react';
@@ -166,7 +165,7 @@ export default function RegisterPage() {
       } else if (error.response?.status === 422) {
         const validationErrors = error.response?.data?.detail;
         if (Array.isArray(validationErrors)) {
-          validationErrors.forEach((err: any) => {
+          validationErrors.forEach((err: { loc: (string | number)[]; msg: string }) => {
             if (err.loc && err.loc[1]) {
               setError(err.loc[1] as keyof RegisterFormData, {
                 type: 'manual',
@@ -183,7 +182,7 @@ export default function RegisterPage() {
     if (!password) return { strength: 0, label: '' };
     
     let strength = 0;
-    let checks = {
+    const checks = {
       length: password.length >= 8,
       uppercase: /[A-Z]/.test(password),
       lowercase: /[a-z]/.test(password),
