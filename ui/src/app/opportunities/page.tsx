@@ -11,13 +11,10 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { toast } from "sonner"
 import {
   TrendingUp,
   Users,
   Star,
-  Filter,
   BarChart3,
   Sparkles
 } from 'lucide-react';
@@ -34,14 +31,7 @@ export default function OpportunitiesPage() {
     { label: 'Top Validated', filters: { validation_score: 'desc' } },
   ];
 
-  const trendingTopicsFallback = [
-    { name: 'AI-Powered Chatbots', count: 120, trend: '+15%' },
-    { name: 'Predictive Analytics', count: 95, trend: '+8%' },
-    { name: 'Content Generation', count: 80, trend: '+22%' },
-    { name: 'Process Automation', count: 75, trend: '-5%' },
-    { name: 'Personalized Recommendations', count: 60, trend: '+12%' },
-  ];
-  const searchParams = useSearchParams();
+    const searchParams = useSearchParams();
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortField, setSortField] = useState<SortField>('validation_score');
@@ -128,6 +118,14 @@ export default function OpportunitiesPage() {
 
   // Generate trending topics from actual opportunities data
   const trendingTopics = React.useMemo(() => {
+    const trendingTopicsFallback = [
+      { name: 'AI-Powered Chatbots', count: 120, trend: '+15%' },
+      { name: 'Predictive Analytics', count: 95, trend: '+8%' },
+      { name: 'Content Generation', count: 80, trend: '+22%' },
+      { name: 'Process Automation', count: 75, trend: '-5%' },
+      { name: 'Personalized Recommendations', count: 60, trend: '+12%' },
+    ];
+    
     if (!opportunityData?.items?.length) {
       return trendingTopicsFallback;
     }

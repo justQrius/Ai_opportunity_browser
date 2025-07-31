@@ -123,7 +123,7 @@ export const useAuthStore = create<AuthState>()(
             isAuthenticated: true,
             isLoading: false,
           });
-                } catch (error: unknown) {
+                } catch {
           // Token is invalid, clear it
           localStorage.removeItem('access_token');
           localStorage.removeItem('refresh_token');

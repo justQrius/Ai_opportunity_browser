@@ -3,24 +3,16 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Separator } from '@/components/ui/separator';
 import { 
   User, 
-  Edit, 
   Star, 
-  TrendingUp, 
   MessageCircle, 
   Bookmark,
   Activity,
   Award,
-  Calendar,
-  MapPin,
-  Mail,
-  Globe,
   Settings
 } from 'lucide-react';
 import { ProfileHeader } from '@/components/profile/profile-header';

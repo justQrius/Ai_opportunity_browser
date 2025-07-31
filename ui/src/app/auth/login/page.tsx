@@ -85,18 +85,21 @@ export default function LoginPage() {
         router.push(redirectTo);
       }, 1000);
       
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Error is handled by the store, but we can add form-specific error handling here
-      if (error.response?.status === 401) {
-        setError('root', {
-          type: 'manual',
-          message: 'Invalid email or password. Please try again.'
-        });
-      } else if (error.response?.status === 429) {
-        setError('root', {
-          type: 'manual',
-          message: 'Too many login attempts. Please try again later.'
-        });
+      if (error instanceof Error && 'response' in error && typeof error.response === 'object' && error.response !== null) {
+        const errorResponse = error.response as { status?: number };
+        if (errorResponse.status === 401) {
+          setError('root', {
+            type: 'manual',
+            message: 'Invalid email or password. Please try again.'
+          });
+        } else if (errorResponse.status === 429) {
+          setError('root', {
+            type: 'manual',
+            message: 'Too many login attempts. Please try again later.'
+          });
+        }
       }
     }
   };

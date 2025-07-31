@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { notFound } from 'next/navigation';
 import { 
@@ -25,7 +25,6 @@ import { toast } from "sonner"
 import {
   ArrowLeft,
   BookmarkPlus,
-  BrainCircuit,
   Share2,
   TrendingUp,
   DollarSign,
@@ -41,8 +40,7 @@ import {
   Flag,
   ExternalLink,
   Download,
-  Eye,
-  Loader2
+  Eye
 } from 'lucide-react';
 import { useOpportunity } from '@/hooks/useOpportunities';
 import { cn } from '@/lib/utils';
@@ -137,8 +135,6 @@ export default function OpportunityDetailPage() {
   
   const [activeTab, setActiveTab] = useState<'overview' | 'validation' | 'discussion' | 'business'>('overview');
   const [bookmarked, setBookmarked] = useState(false);
-  const [deepDiveWorkflowId, setDeepDiveWorkflowId] = useState<string | null>(null);
-  const [isPolling, setIsPolling] = useState(false);
   
   // Use real API data
   const { data: opportunity, isLoading, error } = useOpportunity(opportunityId);
@@ -413,25 +409,25 @@ export default function OpportunityDetailPage() {
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div className="text-center">
                           <div className="text-lg font-semibold">
-                            {(businessIntel as any)?.viability?.market_size_assessment || 'Large Market'}
+                            {businessIntel?.viability?.market_size_assessment || 'Large Market'}
                           </div>
                           <div className="text-sm text-muted-foreground">Market Assessment</div>
                         </div>
                         <div className="text-center">
                           <div className="text-lg font-semibold">
-                            {(businessIntel as any)?.viability?.competition_level || 'Medium'}
+                            {businessIntel?.viability?.competition_level || 'Medium'}
                           </div>
                           <div className="text-sm text-muted-foreground">Competition Level</div>
                         </div>
                         <div className="text-center">
                           <div className="text-lg font-semibold">
-                            {(businessIntel as any)?.viability?.technical_feasibility || 'High'}
+                            {businessIntel?.viability?.technical_feasibility || 'High'}
                           </div>
                           <div className="text-sm text-muted-foreground">Technical Feasibility</div>
                         </div>
                         <div className="text-center">
                           <div className="text-lg font-semibold">
-                            {(businessIntel as any)?.viability?.roi_projection?.time_to_market || '6-12 months'}
+                            {businessIntel?.viability?.roi_projection?.time_to_market || '6-12 months'}
                           </div>
                           <div className="text-sm text-muted-foreground">Time to Market</div>
                         </div>
@@ -785,19 +781,19 @@ export default function OpportunityDetailPage() {
                         <div>
                           <div className="text-sm text-muted-foreground">Break Even</div>
                           <div className="text-lg font-semibold">
-                            {(businessIntel as any)?.viability?.roi_projection?.break_even || mockBusinessIntelligence.roiProjection.time_to_break_even} months
+                            {businessIntel?.viability?.roi_projection?.break_even || mockBusinessIntelligence.roiProjection.time_to_break_even} months
                           </div>
                         </div>
                         <div>
                           <div className="text-sm text-muted-foreground">Time to Market</div>
                           <div className="text-lg font-semibold">
-                            {(businessIntel as any)?.viability?.roi_projection?.time_to_market || '6-12 months'}
+                            {businessIntel?.viability?.roi_projection?.time_to_market || '6-12 months'}
                           </div>
                         </div>
                         <div>
                           <div className="text-sm text-muted-foreground">Year 1 Revenue</div>
                           <div className="text-lg font-semibold text-green-600">
-                            ${(((businessIntel as any)?.viability?.roi_projection?.projected_revenue_y1 || mockBusinessIntelligence.roiProjection.projected_revenue_y1) / 1000000).toFixed(1)}M
+                            ${(((businessIntel?.viability?.roi_projection?.projected_revenue_y1 || mockBusinessIntelligence.roiProjection.projected_revenue_y1) / 1000000).toFixed(1))}M
                           </div>
                         </div>
                         <div>

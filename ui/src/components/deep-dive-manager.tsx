@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
 import { BrainCircuit, Loader2, TrendingUp, Users, DollarSign, Target, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import apiClient from '@/services/api';
@@ -107,12 +106,18 @@ export function DeepDiveManager({ opportunity }: DeepDiveManagerProps) {
       toast.success("Deep Dive Started", {
         description: `AI agents are now analyzing "${opportunity.title}". Results will appear below.`,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       let errorMessage = "An unknown error occurred.";
-      if (error.response?.data?.detail) {
-        errorMessage = error.response.data.detail;
-      } else if (error.message) {
-        errorMessage = error.message;
+      if (error instanceof Error) {
+        // Type guard to check if error has response property
+        if ('response' in error && typeof error.response === 'object' && error.response !== null) {
+          const errorResponse = error.response as { data?: { detail?: string } };
+          if (errorResponse.data?.detail) {
+            errorMessage = errorResponse.data.detail;
+          }
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
       }
       toast.error("Failed to start deep dive.", {
         description: errorMessage,

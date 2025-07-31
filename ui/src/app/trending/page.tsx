@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { 
   Card, 
   CardContent, 
-  CardDescription, 
+  CardDescription,
   CardHeader, 
   CardTitle 
 } from '@/components/ui/card';
@@ -20,14 +20,12 @@ import {
   Brain,
   Zap,
   BarChart3,
-  Users,
   Clock,
   Sparkles,
-  Filter,
   ArrowUp,
   ArrowDown,
   Minus,
-  Calendar,
+  Filter,
   Globe
 } from 'lucide-react';
 import { useTrending } from '@/hooks/useOpportunities';

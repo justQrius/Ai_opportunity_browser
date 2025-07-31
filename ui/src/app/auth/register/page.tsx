@@ -10,7 +10,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { LoadingSpinner } from '@/components';
@@ -155,24 +154,27 @@ export default function RegisterPage() {
         router.push(redirectTo);
       }, 1500);
       
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Error is handled by the store, but we can add form-specific error handling here
-      if (error.response?.status === 409) {
-        setError('email', {
-          type: 'manual',
-          message: 'An account with this email already exists.'
-        });
-      } else if (error.response?.status === 422) {
-        const validationErrors = error.response?.data?.detail;
-        if (Array.isArray(validationErrors)) {
-          validationErrors.forEach((err: { loc: (string | number)[]; msg: string }) => {
-            if (err.loc && err.loc[1]) {
-              setError(err.loc[1] as keyof RegisterFormData, {
-                type: 'manual',
-                message: err.msg
-              });
-            }
+      if (error instanceof Error && 'response' in error && typeof error.response === 'object' && error.response !== null) {
+        const errorResponse = error.response as { status?: number; data?: { detail?: unknown } };
+        if (errorResponse.status === 409) {
+          setError('email', {
+            type: 'manual',
+            message: 'An account with this email already exists.'
           });
+        } else if (errorResponse.status === 422) {
+          const validationErrors = errorResponse.data?.detail;
+          if (Array.isArray(validationErrors)) {
+            validationErrors.forEach((err: { loc: (string | number)[]; msg: string }) => {
+              if (err.loc && err.loc[1]) {
+                setError(err.loc[1] as keyof RegisterFormData, {
+                  type: 'manual',
+                  message: err.msg
+                });
+              }
+            });
+          }
         }
       }
     }

@@ -20,7 +20,6 @@ import {
   DollarSign,
   Brain,
   Users,
-  AlertCircle,
   CheckCircle,
   Loader2
 } from 'lucide-react';
