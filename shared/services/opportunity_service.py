@@ -91,7 +91,7 @@ class OpportunityService:
             tags=tags_json,
             source_urls=source_urls_json,
             discovery_method=opportunity_data.discovery_method or discovered_by_agent,
-            status=OpportunityStatus.DISCOVERED
+            status=OpportunityStatus.draft
         )
         
         db.add(opportunity)

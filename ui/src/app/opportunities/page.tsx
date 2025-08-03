@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { 
@@ -163,6 +164,9 @@ export default function OpportunitiesPage() {
             </div>
             
             <div className="flex items-center gap-2">
+              <Button asChild>
+                <Link href="/opportunities/new">Generate New Opportunity</Link>
+              </Button>
               <Badge variant="secondary" className="gap-1">
                 <Sparkles className="w-3 h-3" />
                 {displayOpportunities.length} opportunities

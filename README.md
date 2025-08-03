@@ -4,28 +4,50 @@ AI-native platform combining autonomous agent-based discovery with community-dri
 
 ## 🚀 Features
 
-- **5 Specialized AI Agents**: MonitoringAgent, AnalysisAgent, ResearchAgent, TrendAgent, CapabilityAgent
-- **Real-time Data Sources**: Reddit, GitHub, Hacker News, Y Combinator  
-- **Community Validation**: User scoring and validation system
+### Core Capabilities
+- **Proper DSPy Integration**: Complete implementation following the DSPy integration plan with MarketResearchSignature, CompetitiveAnalysisSignature, and SynthesisSignature
+- **Real Market Data Integration**: Connects to data ingestion system with Reddit, GitHub, and other market signal sources
+- **Data-Driven Opportunity Generation**: Uses actual market signals, pain points, and feature requests from real sources
+- **Dual-Mode Operation**: Proper DSPy pipeline with real data + fallback custom orchestrator for compatibility
+- **Market Validation**: Each generated opportunity includes data source validation and engagement metrics
+
+### AI & Analysis
+- **5 Specialized AI Agents**: MonitoringAgent, AnalysisAgent, ResearchAgent, TrendAgent, and CapabilityAgent
+- **3-Step DSPy Pipeline**: Market Research → Competitive Analysis → Synthesis with real data flow
+- **Enhanced Output Parsing**: Handles both DSPy structured output and custom formats
+- **Deep Dive Feature**: Initiate in-depth analysis on any opportunity from its detail page
+
+### Data & Sources
+- **Real-time Data Sources**: Reddit discussions, GitHub issues, Hacker News, Y Combinator
+- **Market Signal Processing**: Pain point detection, feature request analysis, engagement scoring
+- **Data Quality Scoring**: Comprehensive quality assessment and duplicate detection
+
+### Platform Features
+- **Community Validation**: User scoring and validation system with reputation tracking
 - **Business Intelligence**: ROI projections, market analysis, competitive intelligence
 - **Modern Frontend**: Next.js 14 with TypeScript, Tailwind CSS, and Shadcn/ui
 - **Production Ready**: Comprehensive authentication, monitoring, and security
 
 ## 🏗️ Architecture
 
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Frontend      │    │   Backend API   │    │   AI Agents     │
-│   (Next.js 14)  │◄──►│   (FastAPI)     │◄──►│   (5 Agents)    │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-         │                       │                       │
-         │                       │                       │
-         ▼                       ▼                       ▼
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   State Mgmt    │    │   Database      │    │   Data Sources  │
-│ (Zustand+Query) │    │ (PostgreSQL)    │    │ Reddit, GitHub  │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-```
+### DSPy Integration (Latest Implementation)
+The system now implements **proper DSPy integration** as specified in the integration plan:
+
+- **DSPy Signatures**: 
+  - `MarketResearchSignature`: Analyzes real market data from ingestion sources
+  - `CompetitiveAnalysisSignature`: Processes competitive intelligence from market signals  
+  - `SynthesisSignature`: Creates opportunities with market validation data
+
+- **Data Pipeline**: Connects DSPy to the data ingestion system for real Reddit/GitHub analysis
+- **Orchestrator**: Dual-mode operation with proper DSPy pipeline + custom orchestrator fallback
+- **Market Data Integration**: Fetches real market signals, engagement metrics, and pain points
+
+### System Architecture
+- **Backend**: FastAPI with async/await, PostgreSQL, Redis, Pinecone vector DB
+- **Data Ingestion**: Plugin architecture with Reddit, GitHub, and other source connectors
+- **AI Pipeline**: DSPy framework with Gemini/OpenAI/Anthropic model support
+- **Frontend**: Next.js 14 App Router with TypeScript and Tailwind CSS
+- **Caching**: In-memory DSPy content cache for detail page integration
 
 ## 📋 Prerequisites
 
@@ -207,7 +229,7 @@ npm run storybook
 │   ├── routers/           # API endpoints
 │   ├── middleware/        # Security, logging, CORS
 │   └── core/             # Configuration, dependencies
-├── agents/                # 5 AI agents for opportunity discovery
+├── agents/                # DSPy-powered AI pipeline and agent modules
 ├── shared/               # Shared models, schemas, services
 │   ├── models/           # Database models
 │   ├── schemas/          # Pydantic schemas
@@ -235,8 +257,13 @@ npm run storybook
 - Review AI agent analysis and business intelligence
 - Check community validation and discussions
 
-### 3. **User Authentication**
-- Register at http://localhost:3004/auth/register  
+### 3. **Initiate a Deep Dive**
+- Navigate to any opportunity's detail page.
+- Click the "Deep Dive" button to trigger a dynamic, multi-agent analysis of the opportunity.
+- A notification will appear confirming the start of the workflow, and another will appear upon completion.
+
+### 4. **User Authentication**
+- Register at http://localhost:3004/auth/register
 - Login at http://localhost:3004/auth/login
 - Access personalized recommendations and collections
 

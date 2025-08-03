@@ -15,6 +15,8 @@ redis==5.0.1
 pinecone-client==2.2.2
 
 # AI/ML Libraries - Multi-Provider Support
+dspy-ai==2.6.27
+litellm==1.60.2
 langchain
 langchain-openai
 langchain-anthropic
@@ -22,7 +24,7 @@ langchain-google-genai
 langchain-community
 
 # AI Provider SDKs
-openai==1.35.10
+openai==1.61.0
 anthropic==0.29.0
 google-generativeai==0.3.2
 cohere==4.37

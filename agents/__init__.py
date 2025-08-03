@@ -1,7 +1,7 @@
 # AI agents package
 
 from .base import BaseAgent, AgentTask, AgentState, AgentPriority, AgentMetrics
-from .orchestrator import AgentOrchestrator, WorkflowState, Workflow
+from .orchestrator import Orchestrator
 from .health_monitor import HealthMonitor, HealthStatus, HealthAlert
 from .monitoring_agent import MonitoringAgent
 from .analysis_agent import AnalysisAgent
@@ -11,7 +11,7 @@ from .capability_agent import CapabilityAgent
 
 __all__ = [
     'BaseAgent', 'AgentTask', 'AgentState', 'AgentPriority', 'AgentMetrics',
-    'AgentOrchestrator', 'WorkflowState', 'Workflow',
+    'Orchestrator',
     'HealthMonitor', 'HealthStatus', 'HealthAlert',
     'MonitoringAgent', 'AnalysisAgent', 'ResearchAgent', 'TrendAgent', 'CapabilityAgent'
 ]
