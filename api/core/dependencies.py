@@ -25,9 +25,9 @@ import structlog
 
 logger = structlog.get_logger(__name__)
 
-from agents.orchestrator import Orchestrator
+from agents.orchestrator import OpportunityOrchestrator
 
-def get_orchestrator(request: Request) -> Orchestrator:
+def get_orchestrator(request: Request) -> OpportunityOrchestrator:
     """
     Get the singleton instance of the AgentOrchestrator from the app state.
     """

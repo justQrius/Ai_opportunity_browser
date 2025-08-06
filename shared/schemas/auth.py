@@ -7,7 +7,7 @@ and authorization-related operations.
 
 from typing import Optional, List, Dict, Any
 from datetime import datetime, timedelta
-from pydantic import EmailStr, Field, validator
+from pydantic import Field, validator
 from .base import BaseSchema
 from shared.models.user import UserRole
 
@@ -15,7 +15,7 @@ from shared.models.user import UserRole
 class LoginRequest(BaseSchema):
     """User login request schema."""
     
-    email: EmailStr
+    email: str
     password: str = Field(..., min_length=1)
     remember_me: bool = False
 
@@ -47,7 +47,7 @@ class RefreshTokenResponse(BaseSchema):
 class RegisterRequest(BaseSchema):
     """User registration request schema."""
     
-    email: EmailStr
+    email: str
     username: str = Field(..., min_length=3, max_length=50, pattern="^[a-zA-Z0-9_-]+$")
     password: str = Field(..., min_length=8, max_length=128)
     full_name: Optional[str] = Field(None, max_length=255)
@@ -93,7 +93,7 @@ class RegisterResponse(BaseSchema):
 class PasswordResetRequest(BaseSchema):
     """Password reset request schema."""
     
-    email: EmailStr
+    email: str
 
 
 class PasswordResetResponse(BaseSchema):

@@ -2,7 +2,7 @@
 
 from typing import Optional, List
 from datetime import datetime
-from pydantic import EmailStr, Field, validator
+from pydantic import Field, validator
 from .base import BaseSchema, TimestampSchema, UUIDSchema
 from shared.models.user import UserRole
 from shared.models.reputation import BadgeType
@@ -11,7 +11,7 @@ from shared.models.reputation import BadgeType
 class UserBase(BaseSchema):
     """Base user schema with common fields."""
     
-    email: EmailStr
+    email: str
     username: str = Field(..., min_length=3, max_length=50)
     full_name: Optional[str] = Field(None, max_length=255)
     bio: Optional[str] = Field(None, max_length=1000)
@@ -74,7 +74,7 @@ class UserResponse(UserBase, UUIDSchema, TimestampSchema):
 class UserLogin(BaseSchema):
     """Schema for user login."""
     
-    email: EmailStr
+    email: str
     password: str
 
 

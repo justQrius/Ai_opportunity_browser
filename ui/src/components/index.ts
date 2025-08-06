@@ -37,6 +37,10 @@ export { ThemeProvider } from './providers/theme-provider';
 export { AuthProvider } from './auth/auth-provider';
 export { ProtectedRoute, withAuth } from './auth/protected-route';
 
+// Data visualization components
+export { DataSourcePanel } from './data-source-panel';
+export { MarketSignalsWidget } from './market-signals-widget';
+
 // Profile components
 export { ProfileHeader } from './profile/profile-header';
 export { ExpertiseSection } from './profile/expertise-section';

@@ -5,6 +5,11 @@ This module sets up the FastAPI application with proper configuration,
 middleware, and routing for the AI Opportunity Browser platform.
 """
 
+from dotenv import load_dotenv
+
+# Load environment variables from .env file before anything else
+load_dotenv()
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
@@ -25,7 +30,7 @@ from shared.logging_config import get_logger
 from shared.security.zero_trust import setup_zero_trust
 from shared.security.service_config import setup_service_registry
 from shared.security.monitoring import setup_security_monitoring
-from agents.orchestrator import Orchestrator
+from agents.orchestrator import OpportunityOrchestrator
 
 # Setup observability (logging, tracing, monitoring)
 observability_config = ObservabilityConfig(
@@ -106,7 +111,7 @@ async def lifespan(app: FastAPI):
     
     # Initialize and start the agent orchestrator
     try:
-        orchestrator = Orchestrator()
+        orchestrator = OpportunityOrchestrator()
         app.state.orchestrator = orchestrator
         logger.info("✅ Agent orchestrator started")
     except Exception as e:

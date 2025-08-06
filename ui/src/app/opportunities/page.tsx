@@ -63,6 +63,29 @@ export default function OpportunitiesPage() {
     size: 12
   });
 
+  // Debug: Test direct API call
+  useEffect(() => {
+    const testAPI = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/api/v1/opportunities/');
+        const data = await response.json();
+        console.log('Direct API test:', data);
+      } catch (error) {
+        console.error('Direct API test failed:', error);
+      }
+    };
+    testAPI();
+  }, []);
+
+  // Debug: Log React Query results
+  useEffect(() => {
+    console.log('React Query results:', {
+      data: opportunityData,
+      isLoading,
+      error: apiError
+    });
+  }, [opportunityData, isLoading, apiError]);
+
   // Initialize from URL params
   useEffect(() => {
     const query = searchParams.get('q');

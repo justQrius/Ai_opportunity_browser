@@ -71,6 +71,14 @@ export interface Opportunity {
     };
     agent_confidence?: number;
   };
+  // Real-time market data from ingestion plugins
+  data_sources?: any[];
+  market_data?: any;
+  pain_points?: any[];
+  feature_requests?: any[];
+  market_discussions?: any[];
+  engagement_metrics?: any;
+  signal_count?: number;
 }
 
 export interface OpportunityFilters {

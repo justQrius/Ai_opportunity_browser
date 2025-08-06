@@ -80,7 +80,7 @@ class OpportunityService:
         if opportunity_data.source_urls:
             source_urls_json = json.dumps(opportunity_data.source_urls)
         
-        # Create opportunity
+        # Create opportunity with defaults for legacy database fields
         opportunity = Opportunity(
             title=opportunity_data.title,
             description=opportunity_data.description,
@@ -94,16 +94,88 @@ class OpportunityService:
             status=OpportunityStatus.draft
         )
         
-        db.add(opportunity)
+        # Set legacy database fields using raw SQL to avoid model conflicts
+        # These fields exist in the database but not in the current model
+        opportunity_dict = {
+            'title': opportunity_data.title,
+            'description': opportunity_data.description,
+            'summary': opportunity_data.summary or "",
+            'status': 'draft',
+            'ai_solution_types': ai_solution_types_json,
+            'required_capabilities': required_capabilities_json,
+            'target_industries': target_industries_json,
+            'geographic_scope': opportunity_data.geographic_scope or 'global',
+            'tags': tags_json,
+            'source_urls': source_urls_json,
+            'discovery_method': opportunity_data.discovery_method or 'ai_agent',
+            'validation_score': 0.0,
+            'confidence_rating': 0.0,
+            'ai_feasibility_score': 7.5,
+            # Legacy database fields
+            'category': target_industries_json if target_industries_json else '["Technology"]',
+            'confidence_score': 8.0,
+            'difficulty_level': 3,
+            'view_count': 0,
+            'upvotes': 0,
+            'downvotes': 0,
+            'bookmark_count': 0,
+            'validation_count': 0
+        }
+        
+        # Use raw SQL insert to handle legacy fields
+        from sqlalchemy import text
+        import uuid
+        
+        opportunity_id = str(uuid.uuid4())
+        
+        sql = text("""
+            INSERT INTO opportunities (
+                id, title, description, summary, status, ai_solution_types, 
+                required_capabilities, target_industries, geographic_scope, tags, 
+                source_urls, discovery_method, validation_score, confidence_rating, 
+                ai_feasibility_score, category, confidence_score, difficulty_level,
+                view_count, upvotes, downvotes, bookmark_count, validation_count
+            ) VALUES (
+                :id, :title, :description, :summary, :status, :ai_solution_types,
+                :required_capabilities, :target_industries, :geographic_scope, :tags,
+                :source_urls, :discovery_method, :validation_score, :confidence_rating,
+                :ai_feasibility_score, :category, :confidence_score, :difficulty_level,
+                :view_count, :upvotes, :downvotes, :bookmark_count, :validation_count
+            ) RETURNING id, created_at, updated_at
+        """)
+        
+        result = await db.execute(sql, {
+            'id': opportunity_id,
+            **opportunity_dict
+        })
         await db.commit()
-        await db.refresh(opportunity)
+        
+        # Fetch the created opportunity
+        created_row = result.fetchone()
+        
+        # Create a simple return object with the key fields
+        class CreatedOpportunity:
+            def __init__(self, id, title, description, summary, created_at):
+                self.id = id
+                self.title = title  
+                self.description = description
+                self.summary = summary
+                self.created_at = created_at
         
         logger.info(
             "Opportunity created",
-            opportunity_id=opportunity.id,
-            title=opportunity.title,
+            opportunity_id=opportunity_id,
+            title=opportunity_data.title,
             ai_types=opportunity_data.ai_solution_types,
             discovered_by=discovered_by_agent
+        )
+        
+        return CreatedOpportunity(
+            id=opportunity_id,
+            title=opportunity_data.title,
+            description=opportunity_data.description, 
+            summary=opportunity_data.summary or "",
+            created_at=created_row[1] if created_row else None
         )
         
         # Publish opportunity created event
@@ -165,7 +237,7 @@ class OpportunityService:
         if include_relationships:
             query = query.options(
                 selectinload(Opportunity.market_signals),
-                selectinload(Opportunity.validations),
+                selectinload(Opportunity.validations),  # Re-enabled to test with real data
                 selectinload(Opportunity.ai_capability_assessment),
                 selectinload(Opportunity.implementation_guide)
             )
@@ -277,7 +349,7 @@ class OpportunityService:
         # Build base query
         query = select(Opportunity).options(
             selectinload(Opportunity.market_signals),
-            selectinload(Opportunity.validations)
+            selectinload(Opportunity.validations)  # Re-enabled to test with real data
         )
         
         # Apply filters
@@ -288,7 +360,7 @@ class OpportunityService:
             filters.append(Opportunity.status.in_(search_request.status))
         else:
             # Default to non-rejected opportunities
-            filters.append(Opportunity.status != OpportunityStatus.REJECTED)
+            filters.append(Opportunity.status != OpportunityStatus.archived)
         
         # Validation score filter
         if search_request.min_validation_score is not None:

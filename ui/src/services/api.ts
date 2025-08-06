@@ -3,7 +3,7 @@ import axios, { AxiosResponse } from 'axios';
 // Create axios client with base configuration
 const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1',
-  timeout: 10000,
+  timeout: 120000, // 2 minutes for DSPy opportunity generation
   headers: {
     'Content-Type': 'application/json',
   },

@@ -20,9 +20,10 @@ export const opportunityKeys = {
 // Get opportunities with filters
 export const useOpportunities = (params?: SearchParams) => {
   return useQuery({
-    queryKey: opportunityKeys.list(params),
+    queryKey: [...opportunityKeys.list(params), 'v2'], // Force cache invalidation
     queryFn: () => opportunitiesService.getOpportunities(params),
-    staleTime: 2 * 60 * 1000, // 2 minutes for list data
+    staleTime: 0, // Disable caching temporarily
+    cacheTime: 0, // Disable cache storage
   });
 };
 

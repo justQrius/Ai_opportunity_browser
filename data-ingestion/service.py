@@ -15,6 +15,9 @@ from processing.quality_scoring import QualityScorer, quality_scoring_task, batc
 from plugins.base import RawData, PluginConfig
 from plugins.reddit_plugin import RedditPlugin, RedditConfig
 from plugins.github_plugin import GitHubPlugin, GitHubConfig
+from plugins.hackernews_plugin import HackerNewsPlugin, HackerNewsConfig
+from plugins.producthunt_plugin import ProductHuntPlugin, ProductHuntConfig
+from plugins.ycombinator_plugin import YCombinatorPlugin, YCombinatorConfig
 from shared.database import get_db_session
 from shared.models.market_signal import MarketSignal, SignalType
 from shared.vector_db import VectorDBService
@@ -373,6 +376,24 @@ class DataIngestionService:
             github_config = GitHubConfig(**plugin_configs['github'])
             self.plugin_manager.register_plugin('github', GitHubPlugin)
             await self.plugin_manager.load_plugin('github', github_config)
+        
+        # Load HackerNews plugin if configured
+        if 'hackernews' in plugin_configs:
+            hackernews_config = HackerNewsConfig(**plugin_configs['hackernews'])
+            self.plugin_manager.register_plugin('hackernews', HackerNewsPlugin)
+            await self.plugin_manager.load_plugin('hackernews', hackernews_config)
+        
+        # Load ProductHunt plugin if configured
+        if 'producthunt' in plugin_configs:
+            producthunt_config = ProductHuntConfig(**plugin_configs['producthunt'])
+            self.plugin_manager.register_plugin('producthunt', ProductHuntPlugin)
+            await self.plugin_manager.load_plugin('producthunt', producthunt_config)
+        
+        # Load YCombinator plugin if configured
+        if 'ycombinator' in plugin_configs:
+            ycombinator_config = YCombinatorConfig(**plugin_configs['ycombinator'])
+            self.plugin_manager.register_plugin('ycombinator', YCombinatorPlugin)
+            await self.plugin_manager.load_plugin('ycombinator', ycombinator_config)
     
     async def _ingest_from_source_task(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         """Task handler for ingesting from a specific source."""

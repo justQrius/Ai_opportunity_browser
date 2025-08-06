@@ -36,6 +36,7 @@ interface ApiOpportunity {
   title: string;
   description: string;
   market_size?: number;
+  market_size_estimate?: number; // API returns this field name
   validation_score: number;
   ai_feasibility_score?: number;
   target_industries?: string[];
@@ -49,6 +50,14 @@ interface ApiOpportunity {
   generated_by?: string;
   generation_method?: string;
   agent_analysis?: Opportunity['agent_analysis'];
+  // Additional fields that API may return
+  data_sources?: any[];
+  market_data?: any;
+  pain_points?: any[];
+  feature_requests?: any[];
+  market_discussions?: any[];
+  engagement_metrics?: any;
+  signal_count?: number;
 }
 
 // Helper function to transform API opportunity to frontend format
@@ -56,7 +65,7 @@ const transformOpportunity = (apiOpp: ApiOpportunity): Opportunity => ({
   id: apiOpp.id,
   title: apiOpp.title,
   description: apiOpp.description,
-  market_size_estimate: apiOpp.market_size || 0,
+  market_size_estimate: apiOpp.market_size_estimate || apiOpp.market_size || 0,
   validation_score: apiOpp.validation_score,
   ai_feasibility_score: apiOpp.ai_feasibility_score || 7.5, // Default value
   industry: Array.isArray(apiOpp.target_industries) ? apiOpp.target_industries[0] || 'Technology' : apiOpp.industry || 'Technology',
@@ -68,6 +77,14 @@ const transformOpportunity = (apiOpp: ApiOpportunity): Opportunity => ({
   generated_by: apiOpp.generated_by,
   generation_method: apiOpp.generation_method,
   agent_analysis: apiOpp.agent_analysis,
+  // Additional fields for market data display
+  data_sources: apiOpp.data_sources,
+  market_data: apiOpp.market_data,
+  pain_points: apiOpp.pain_points,
+  feature_requests: apiOpp.feature_requests,
+  market_discussions: apiOpp.market_discussions,
+  engagement_metrics: apiOpp.engagement_metrics,
+  signal_count: apiOpp.signal_count || 0,
 });
 
 export const opportunitiesService = {

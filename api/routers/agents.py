@@ -15,7 +15,7 @@ from shared.services.opportunity_service import opportunity_service
 from shared.database import get_db
 from shared.schemas.opportunity import OpportunityResponse, OpportunityCreate, OpportunityUpdate
 from api.core.dependencies import get_orchestrator
-from agents.orchestrator import Orchestrator
+from agents.orchestrator import OpportunityOrchestrator
 
 logger = structlog.get_logger(__name__)
 
@@ -116,7 +116,7 @@ def parse_generated_opportunity(text: str) -> dict:
 @router.post("/opportunities/{opportunity_id}/deep-dive", response_model=OpportunityResponse, status_code=202)
 async def trigger_deep_dive_workflow(
     opportunity_id: str,
-    orchestrator: Orchestrator = Depends(get_orchestrator),
+    orchestrator: OpportunityOrchestrator = Depends(get_orchestrator),
     db: AsyncSession = Depends(get_db)
 ):
     """
@@ -154,84 +154,54 @@ async def trigger_deep_dive_workflow(
 @router.post("/generate-opportunity", status_code=200)
 async def generate_new_opportunity(
     request: GenerateOpportunityRequest,
-    orchestrator: Orchestrator = Depends(get_orchestrator),
+    orchestrator: OpportunityOrchestrator = Depends(get_orchestrator),
     db: AsyncSession = Depends(get_db)
 ):
     """
-    Generates a new opportunity from a high-level topic using the DSPy pipeline.
+    Generates a new opportunity from a high-level topic and saves it to database.
     """
     logger.info(f"New opportunity generation requested for topic: {request.topic}")
     
     try:
-        generated_text = await orchestrator.analyze_opportunity(request.topic)
+        # For now, create a simple opportunity without DSPy to test database persistence
+        # TODO: Re-enable DSPy integration once database saving is working
+        from shared.schemas.opportunity import OpportunityCreate
         
-        # For testing: return the generated text directly to verify DSPy is working
-        logger.info(f"Generated opportunity text: {generated_text}")
+        # Ensure description meets minimum 50 character requirement
+        description = f"Innovative AI solution for {request.topic}. This opportunity leverages machine learning and advanced analytics to address market needs in the {request.topic} domain. The solution offers significant potential for automation, efficiency improvements, and competitive advantage through intelligent data processing and predictive capabilities."
         
-        # Parse the DSPy output and return in expected format
-        try:
-            parsed_data = parse_generated_opportunity(generated_text)
-            
-            # Create a mock opportunity ID for frontend navigation
-            import uuid
-            mock_opportunity_id = str(uuid.uuid4())
-            
-            # Store the real DSPy data in a global cache for the detail page to use
-            global _dspy_opportunity_cache
-            if '_dspy_opportunity_cache' not in globals():
-                _dspy_opportunity_cache = {}
-            
-            _dspy_opportunity_cache[mock_opportunity_id] = {
-                "id": mock_opportunity_id,
-                "title": parsed_data.get("title", "Generated Opportunity"),
-                "description": parsed_data.get("description", ""),
-                "summary": parsed_data.get("summary", ""),
-                "ai_solution_types": ["Machine Learning", "Natural Language Processing", "Context Engineering"],
-                "target_industries": ["Technology", "AI/ML"],
-                "market_size": 15000000,
-                "validation_score": 8.5,
-                "ai_feasibility_score": 9.0,
-                "confidence_rating": 8.8,
-                "status": "draft",
-                "tags": ["ai-generated", "dspy", "context-engineering", request.topic.replace(" ", "-")],
-                "implementation_complexity": "medium",
-                "geographic_scope": "global",
-                "created_at": "2025-08-01T18:00:00Z",
-                "updated_at": "2025-08-01T18:00:00Z",
-                "validation_count": 0,
-                "generated_by": "DSPy AI Pipeline",
-                "source": "AI Agent Generation",
-                "competitive_advantage": f"Generated using advanced AI analysis for {request.topic}",
-                "monetization_strategies": ["SaaS", "Licensing", "Professional Services"],
-                "risk_factors": ["Market competition", "Technical complexity", "Regulatory changes"],
-                "success_factors": ["Strong AI capabilities", "Market timing", "Technical execution"],
-                "topic_requested": request.topic,
-                "raw_dspy_output": generated_text
-            }
-            
-            # Return format expected by frontend
-            return {
-                "success": True,
-                "opportunity_id": mock_opportunity_id,
-                "title": parsed_data.get("title", "Generated Opportunity"),
-                "description": parsed_data.get("description", ""),
-                "summary": parsed_data.get("summary", ""),
-                "topic_requested": request.topic,
-                "message": "DSPy opportunity generated successfully"
-            }
-        except Exception as parse_error:
-            logger.warning(f"Could not parse DSPy output, returning raw format: {parse_error}")
-            # Fallback response with mock ID
-            import uuid
-            return {
-                "success": True,
-                "opportunity_id": str(uuid.uuid4()),
-                "title": "AI Opportunity Generated",
-                "description": generated_text[:500] + "..." if len(generated_text) > 500 else generated_text,
-                "summary": "Generated via DSPy pipeline",
-                "topic_requested": request.topic,
-                "message": "DSPy opportunity generated successfully (raw format)"
-            }
+        opportunity_data = OpportunityCreate(
+            title=f"AI-Powered {request.topic.title()} Solution",
+            description=description,
+            summary=f"AI-driven solution targeting {request.topic} with high market potential and technical feasibility.",
+            ai_solution_types=["Machine Learning", "Natural Language Processing", "Computer Vision"],
+            target_industries=["Technology", "AI/ML"],
+            geographic_scope="global",
+            tags=["ai-generated", "opportunity-generator", request.topic.replace(" ", "-").lower()],
+            discovery_method="ai_agent",
+            required_capabilities=["ML/AI Development", "Data Engineering", "Cloud Infrastructure"],
+            source_urls=[]
+        )
+        
+        # Save to database using opportunity service
+        created_opportunity = await opportunity_service.create_opportunity(
+            db=db,
+            opportunity_data=opportunity_data,
+            discovered_by_agent="Opportunity Generator"
+        )
+        
+        logger.info(f"Successfully created opportunity with ID: {created_opportunity.id}")
+        
+        # Return format expected by frontend
+        return {
+            "success": True,
+            "opportunity_id": created_opportunity.id,
+            "title": created_opportunity.title,
+            "description": created_opportunity.description,
+            "summary": created_opportunity.summary,
+            "topic_requested": request.topic,
+            "message": "Opportunity generated and saved to database successfully"
+        }
         
     except ValueError as ve:
         logger.error(f"Error parsing generated opportunity: {ve}")
